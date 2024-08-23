@@ -79,7 +79,12 @@ Resources:
           Properties:
             Path: /books
             Method: PATCH
-        GetBooks:
+        GetAllBooks:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: GET
+        GetBookById:
           Type: Api
           Properties:
             Path: /books/{bookId}

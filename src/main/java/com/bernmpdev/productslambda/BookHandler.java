@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 
+import static com.bernmpdev.productslambda.MessageUtil.returnMessage;
 import static com.bernmpdev.productslambda.ResponseUtil.createResponse;
 
 public class BookHandler {
@@ -43,15 +44,14 @@ public class BookHandler {
     public APIGatewayProxyResponseEvent saveBook(APIGatewayProxyRequestEvent request, Context ignoredContext) {
         try {
             if (request.getBody() == null || request.getBody().isEmpty()) {
-                return createResponse(400, "Request body is missing");
+                return createResponse(400, returnMessage("Request body is missing"));
             }
 
             Book book = objectMapper.readValue(request.getBody(), Book.class);
 
             bookRepository.save(book);
 
-            String returnValue = objectMapper.writeValueAsString(Map.of("Message", "Book saved successfully!"));
-            return createResponse(200, returnValue);
+            return createResponse(200, returnMessage("Book saved successfully!"));
         } catch (Exception e) {
             return ExceptionHandler.handleException(e);
         }
@@ -74,7 +74,7 @@ public class BookHandler {
     private APIGatewayProxyResponseEvent getBookById(String bookId) {
         try {
             if (bookId == null || bookId.isEmpty()) {
-                return createResponse(400, "Invalid path parameter: bookId is null or empty");
+                return createResponse(400, returnMessage("Invalid path parameter: bookId is null or empty"));
             }
 
             Book book = bookRepository.getById(bookId);
@@ -83,7 +83,7 @@ public class BookHandler {
                 String body = objectMapper.writeValueAsString(book);
                 return createResponse(200, body);
             } else {
-                return createResponse(404, "Book not found!");
+                return createResponse(404, returnMessage("Book not found"));
             }
         } catch (Exception e) {
             return ExceptionHandler.handleException(e);
@@ -107,9 +107,9 @@ public class BookHandler {
 
             if (book != null) {
                 bookRepository.delete(book);
-                return createResponse(200, "Book deleted successfully!");
+                return createResponse(200, returnMessage("Book deleted successfully!"));
             } else {
-                return createResponse(404, "Book not found!");
+                return createResponse(404, returnMessage("Book not found!"));
             }
         } catch (Exception e) {
             return ExceptionHandler.handleException(e);
@@ -120,13 +120,13 @@ public class BookHandler {
         try {
 
             if (request.getBody() == null || request.getBody().isEmpty()) {
-                return createResponse(400, "Request body is missing");
+                return createResponse(400, returnMessage("Request body is missing"));
             }
 
             Book updatedBook = objectMapper.readValue(request.getBody(), Book.class);
 
             if (updatedBook.getId() == null || updatedBook.getId().isEmpty()) {
-                return createResponse(400, "Book Id is missing");
+                return createResponse(400, returnMessage("Book Id is missing"));
             }
 
             Book existingBook = bookRepository.getById(updatedBook.getId());
@@ -136,12 +136,9 @@ public class BookHandler {
 
                 bookRepository.save(existingBook);
 
-                String returnValue = objectMapper
-                        .writeValueAsString(Map.of("Message", "Book updated successfully!"));
-
-                return createResponse(200, returnValue);
+                return createResponse(200, returnMessage("Book updated successfully!"));
             } else {
-                return createResponse(404, "Book not found!");
+                return createResponse(404, returnMessage("Book not found!"));
             }
         } catch (Exception e) {
             return ExceptionHandler.handleException(e);
